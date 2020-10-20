@@ -18,10 +18,13 @@ class Handler {
 		return $this->client;
 	}
 	
-	public function getData($uri = "posts", $id = ""){
+	public function getData($uri = "posts", $id = "", $conditions = array ()){
+		$stringConditions = "";
+		if(!empty($conditions))
+			$stringConditions = "?".http_build_query($conditions);
 		if(in_array($uri, $this->uri)){
 			try {
-				return array("status" => 1 , "content" => json_decode($this->client->get("$uri/$id")->getBody()->getContents()));
+				return array("status" => 1 , "content" => json_decode($this->client->get("$uri/$id$stringConditions")->getBody()->getContents()));
 			} catch (Exception $e) {
 			    return array("status" => 0 , "content" => $e->getMessage());
 			}
@@ -88,7 +91,7 @@ else
 
 #Get Resource
 echo("\n --- Read ---\n");
-$response = $handler->getData("users");
+$response = $handler->getData("users", "", array("id" => 1));
 if($response['status']){
 	if(is_array($response['content'])){
 		foreach($response['content'] as $value){
